@@ -46,8 +46,9 @@ local function upload_file(filepath, ftp_config)
 	os.remove(script_path)
 end
 
-function module.setup()
-	vim.keymap.set("n", "<Leader>su", function()
+function module.setup(opts)
+	local key = opts.keymap or "<Leader>fu"
+	vim.keymap.set("n", key, function()
 		local ftp_config = get_ftp_config()
 		if not ftp_config then
 			print("No valid FTP config for this project.")

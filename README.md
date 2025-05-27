@@ -6,7 +6,6 @@ A simple plugin to upload files to FTP compatible with windows!
 * test FTP on windows
 * add more messages
 * write README
-* allow users to configure own keymap
 
 ## wishlist
 * add multiple servers per project
