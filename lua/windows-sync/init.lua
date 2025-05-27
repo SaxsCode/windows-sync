@@ -1,5 +1,16 @@
 local module = {}
 
+local function get_ftp_config()
+	local config_path = vim.fn.getcwd() .. "/ftp_config.lua"
+	local ok, config = pcall(dofile, config_path)
+	if ok then
+		return config
+	else
+		print("No project FTP config found or error in config file.")
+		return nil
+	end
+end
+
 local function upload_file(filepath, ftp_config)
 	if vim.loop.os_uname().sysname ~= "Windows_NT" then
 		print("windows-ftp does not work on " .. vim.loop.os_uname().sysname)
@@ -35,9 +46,13 @@ local function upload_file(filepath, ftp_config)
 	os.remove(script_path)
 end
 
-function module.setup(opts)
-	local ftp_config = opts or {}
+function module.setup()
 	vim.keymap.set("n", "<Leader>su", function()
+		local ftp_config = get_ftp_config()
+		if not ftp_config then
+			print("No valid FTP config for this project.")
+			return
+		end
 		local filepath = vim.api.nvim_buf_get_name(0)
 		upload_file(filepath, ftp_config)
 	end, { desc = "Upload current file" })
