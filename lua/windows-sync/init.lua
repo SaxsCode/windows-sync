@@ -1,6 +1,11 @@
 local module = {}
 
 local function upload_file(filepath, ftp_config)
+	if vim.loop.os_uname().sysname ~= "Windows_NT" then
+		print("windows-ftp does not work on " .. vim.loop.os_uname().sysname)
+		return
+	end
+
 	local script_path = os.tmpname() .. ".ftp"
 	local script = string.format(
 		[[
