@@ -45,6 +45,7 @@ local function upload_file_with_winscp(filepath, ftp_config)
 	)
 
 	-- Execute the command
+	print("Executing command:", cmd)
 	local result = os.execute(cmd)
 	if result == 0 then
 		print("Success: Uploaded " .. filepath .. " to " .. remote_path)
