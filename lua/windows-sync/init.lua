@@ -6,7 +6,7 @@ local function get_ftp_config()
 	if ok then
 		return config
 	else
-		print("No project FTP config found or error in config file.")
+		print("Error: No project FTP config found or error in config file.")
 		return nil
 	end
 end
@@ -25,9 +25,9 @@ local function upload_file_with_curl(filepath, ftp_config)
 	-- Execute the command
 	local result = os.execute(cmd)
 	if result == 0 then
-		print("[ftp-upload] Success: Uploaded " .. filepath .. " to " .. ftp_url)
+		print("Success: Uploaded " .. filepath .. " to " .. ftp_url)
 	else
-		print("[ftp-upload] Error: Upload failed.")
+		print("Error: Upload failed.")
 	end
 end
 
@@ -36,7 +36,7 @@ function module.setup(opts)
 	vim.keymap.set("n", key, function()
 		local ftp_config = get_ftp_config()
 		if not ftp_config then
-			print("No valid FTP config for this project.")
+			print("Error: No valid FTP config for this project.")
 			return
 		end
 		local filepath = vim.api.nvim_buf_get_name(0)
