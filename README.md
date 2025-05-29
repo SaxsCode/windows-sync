@@ -6,18 +6,21 @@ A simple Lua plugin for Neovim to upload files to FTP servers, designed specific
 
 ## Features
 
-- Upload the current file to a configured FTP server directly from Neovim using `curl`.
-- Fully automated FTP uploads with username and password authentication.
-- Easy per-project FTP configuration via a Lua config file.
-- Configurable keymap for quick uploads.
+- **Upload the current file to a configured FTP server directly from Neovim using WinSCP.**
+- **Automatic remote directory creation**
+- **Fully automated FTP uploads with username and password authentication.**
+- **Easy per-project FTP configuration via a Lua config file.**
+- **Configurable keymap for quick uploads.**
+- **Optional auto-upload on save.**
 
 ---
 
 ## Requirements
 
-- **`curl` must be installed and available in your system's PATH.**  
-  Windows 10 and later include `curl` by default.  
-  For older versions, download it from [https://curl.se/windows/](https://curl.se/windows/).
+- **WinSCP must be installed and available in your system's PATH.**
+  - Download WinSCP from [https://winscp.net/eng/download.php](https://winscp.net/eng/download.php).
+  - For best results, add WinSCP to your system PATH during installation.
+- **Neovim (latest stable version recommended).**
 
 ---
 
@@ -27,12 +30,14 @@ Use your favorite plugin manager. For example, with [lazy.nvim](https://github.c
 
 ```lua
 return {
-  'saxscode/windows-sync',
-  opts = {
-    keymap = '<Leader>fu', -- Optional, defaults to <Leader>fu
-  },
+    'saxscode/windows-sync',
+    opts = {
+        keymap = '<Leader>fu', -- Optional, defaults to <Leader>fu
+        auto_upload = false, -- Set to true to enable auto-upload on save
+    },
 }
 ```
+
 ---
 
 ## Configuration
@@ -45,30 +50,24 @@ return {
     user = "", -- FTP username
     password = "", -- FTP password
     remote_path = "", -- Remote path including filename or directory
-    project_root = nil, -- if nil, use config directory as root
+    project_root = nil -- If nil, use config directory as root
 }
-
 ```
 
 **Note:**  
 - The `host` should be just the hostname without `ftp://` or trailing slashes.  
 - `remote_path` can be a directory (e.g., `"/"`) or full remote filename (e.g., `"/myfile.txt"`).
+- `project_root` can be set to a subfolder of your project to control which local paths are mirrored remotely.
 
 ---
 
 ## Usage
 
-- Open a file in Neovim.
-- Press the configured keymap (default `<Leader>fu`) to upload the current file to the remote FTP server.
-- The plugin uses `curl` to perform the upload automatically using your FTP credentials.
-
----
-
-## Todo
-
-- Upload files to correct remote path when inside subfolders.
-- Create a command to upload files.
-- Allow passing parameters to upload specific files or folders.
+- **Open a file in Neovim.**
+- **Press the configured keymap (default `<Leader>fu`)** to upload the current file to the remote FTP server.
+- **Enable auto-upload on save** by setting `auto_upload = true` in your plugin configuration.
+  - This will automatically upload the file every time you save it (`:w`).
+- **The plugin uses WinSCP to perform the upload and create remote directories as needed.**
 
 ---
 
@@ -77,14 +76,17 @@ return {
 - Support multiple FTP servers per project.
 - Add a command to generate a default FTP config in the project root.
 - Add download functionality from remote server.
+- Create a command to upload files.
+- Allow passing parameters to upload specific files or folders.
 
 ---
 
 ## Notes and Limitations
 
-- Requires `curl` installed and accessible in your system PATH.
-- Passwords are stored in plaintext in the config file — use with caution.
-- The plugin is a simple starting point and can be extended with more features and robustness.
+- **Requires WinSCP installed and accessible in your system PATH.**
+- **Passwords are stored in plaintext in the config file — use with caution.**
+- **Auto-upload on save can be enabled or disabled in the plugin configuration.**
+- **The plugin is a simple starting point and can be extended with more features and robustness.**
 
 ---
 
@@ -104,10 +106,3 @@ MIT License
 
 Inspired by common FTP upload workflows and Neovim plugin best practices.  
 Thanks to the Neovim community for guidance and support.
-
-Related
-What specific curl commands do I need to include for setup or testing
-How can I demonstrate curl's capabilities effectively in my documentation
-Are there common curl options that enhance my plugin's functionality
-How do I explain the integration of curl with my FTP plugin clearly
-What troubleshooting tips should I add for users using curl with my plugin
