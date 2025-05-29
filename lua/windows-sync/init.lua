@@ -55,6 +55,9 @@ end
 
 function module.setup(opts)
 	local key = opts.keymap or "<Leader>fu"
+	local auto_upload = opts.auto_upload or false
+
+	-- Keymap
 	vim.keymap.set("n", key, function()
 		local ftp_config = get_ftp_config()
 		if not ftp_config then
@@ -64,6 +67,23 @@ function module.setup(opts)
 		local filepath = vim.api.nvim_buf_get_name(0)
 		upload_file_with_winscp(filepath, ftp_config)
 	end, { desc = "Upload current file" })
+
+	if auto_upload then
+		vim.api.nvim_create_autocmd("BufWritePost", {
+			group = vim.api.nvim_create_augroup("FtpAutoUpload", {
+				clear = true,
+			}),
+			callback = function(args)
+				local ftp_config = get_ftp_config()
+				if not ftp_config then
+					print("Error: No valid FTP config for this project.")
+					return
+				end
+				local filepath = vim.api.nvim_buf_get_name(args.buf)
+				upload_file_with_winscp(filepath, ftp_config)
+			end,
+		})
+	end
 end
 
 return module
