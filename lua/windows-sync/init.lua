@@ -50,7 +50,7 @@ local function upload_file_with_winscp(filepath, ftp_config)
 	if result == 0 then
 		print("Success: Uploaded " .. filepath .. " to " .. remote_path)
 	else
-		print("Error: Upload failed.")
+		print("Error: Upload failed.", cmd)
 	end
 end
 
