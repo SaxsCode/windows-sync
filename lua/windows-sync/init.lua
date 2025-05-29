@@ -11,22 +11,19 @@ local function get_ftp_config()
 	end
 end
 
-local function upload_file_with_curl(filepath, ftp_config)
+local function upload_file_with_winscp(filepath, ftp_config)
+	-- Compute remote path as before
 	local config_directory = vim.fn.fnamemodify(vim.fn.getcwd(), ":p")
 	local project_root = ftp_config.project_root or config_directory
 	if project_root:sub(1, 1) ~= "/" and project_root:sub(2, 2) ~= ":" then
-		-- If project_root is relative, join it with config_dir
-		project_root = vim.fn.fnamemodify(config_dir .. "/" .. project_root, ":p")
+		project_root = vim.fn.fnamemodify(config_directory .. "/" .. project_root, ":p")
 	else
-		-- Already absolute, ensure it's full path
 		project_root = vim.fn.fnamemodify(project_root, ":p")
 	end
-
 	local relative_path = vim.fn.fnamemodify(filepath, ":p")
 	relative_path = relative_path:gsub(project_root, "")
 	relative_path = relative_path:gsub("\\", "/")
 
-	-- Construct remote path
 	local remote_base = ftp_config.remote_path
 	if remote_base:sub(-1) ~= "/" then
 		remote_base = remote_base .. "/"
@@ -35,15 +32,22 @@ local function upload_file_with_curl(filepath, ftp_config)
 
 	local escaped_filepath = filepath:gsub("\\", "/")
 
-	local ftp_url =
-		string.format("ftp://%s:%s@%s%s", ftp_config.user, ftp_config.password, ftp_config.host, remote_path)
-
-	local cmd = string.format('curl -T "%s" "%s"', escaped_filepath, ftp_url)
+	-- WinSCP command (create directory and upload file)
+	local remote_dir = remote_path:match("(.*/)") or remote_base
+	local cmd = string.format(
+		'winscp.com /command "open ftp://%s:%s@%s/" "mkdir %s" "put "%s" "%s"" "exit"',
+		ftp_config.user,
+		ftp_config.password,
+		ftp_config.host,
+		remote_dir,
+		escaped_filepath,
+		remote_path
+	)
 
 	-- Execute the command
 	local result = os.execute(cmd)
 	if result == 0 then
-		print("Success: Uploaded " .. filepath .. " to " .. ftp_url)
+		print("Success: Uploaded " .. filepath .. " to " .. remote_path)
 	else
 		print("Error: Upload failed.")
 	end
@@ -58,7 +62,7 @@ function module.setup(opts)
 			return
 		end
 		local filepath = vim.api.nvim_buf_get_name(0)
-		upload_file_with_curl(filepath, ftp_config)
+		upload_file_with_winscp(filepath, ftp_config)
 	end, { desc = "Upload current file" })
 end
 
