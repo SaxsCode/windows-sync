@@ -41,7 +41,7 @@ local function upload_file(filepath, ftp_config)
 	-- Run the FTP command
 	local cmd = string.format('ftp -s:"%s"', script_path)
 	os.execute(cmd)
-	print("File uploaded to remote server: " .. filepath)
+	print("File uploaded to remote server: " .. ftp_config.host .. ftp_config.remote_path .. )
 
 	-- Clean up
 	os.remove(script_path)
