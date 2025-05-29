@@ -11,41 +11,24 @@ local function get_ftp_config()
 	end
 end
 
-local function upload_file(filepath, ftp_config)
-	if vim.loop.os_uname().sysname ~= "Windows_NT" then
-		print("windows-ftp does not work on " .. vim.loop.os_uname().sysname)
-		return
+local function upload_file_with_curl(filepath, ftp_config)
+	-- Construct FTP URL with credentials
+	local ftp_url =
+		string.format("ftp://%s:%s@%s%s", ftp_config.user, ftp_config.password, ftp_config.host, ftp_config.remote_path)
+
+	-- Escape backslashes in Windows path for curl
+	local escaped_filepath = filepath:gsub("\\", "/")
+
+	-- Build curl command
+	local cmd = string.format('curl -T "%s" "%s"', escaped_filepath, ftp_url)
+
+	-- Execute the command
+	local result = os.execute(cmd)
+	if result == 0 then
+		print("[ftp-upload] Success: Uploaded " .. filepath .. " to " .. ftp_url)
+	else
+		print("[ftp-upload] Error: Upload failed.")
 	end
-
-	local script_path = os.tmpname() .. ".ftp"
-	local script = string.format(
-		[[
-    open %s
-    %s
-    %s
-    binary
-    put "%s" "%s"
-    bye
-  ]],
-		ftp_config.host,
-		ftp_config.user,
-		ftp_config.password,
-		filepath,
-		ftp_config.remote_path
-	)
-
-	-- Write the script to a temp file
-	local f = io.open(script_path, "w")
-	f:write(script)
-	f:close()
-
-	-- Run the FTP command
-	local cmd = string.format('ftp -s:"%s"', script_path)
-	os.execute(cmd)
-	print("File uploaded to remote server: " .. ftp_config.host .. ftp_config.remote_path)
-
-	-- Clean up
-	os.remove(script_path)
 end
 
 function module.setup(opts)
@@ -57,7 +40,7 @@ function module.setup(opts)
 			return
 		end
 		local filepath = vim.api.nvim_buf_get_name(0)
-		upload_file(filepath, ftp_config)
+		upload_file_with_curl(filepath, ftp_config)
 	end, { desc = "Upload current file" })
 end
 
