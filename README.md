@@ -45,6 +45,7 @@ return {
     user = "", -- FTP username
     password = "", -- FTP password
     remote_path = "", -- Remote path including filename or directory
+    project_root = nil, -- if nil, use config directory as root
 }
 
 ```
@@ -91,3 +92,22 @@ return {
 
 Contributions, issues, and feature requests are welcome! Feel free to open a pull request or issue on GitHub.
 
+---
+
+## License
+
+MIT License
+
+---
+
+## Acknowledgments
+
+Inspired by common FTP upload workflows and Neovim plugin best practices.  
+Thanks to the Neovim community for guidance and support.
+
+Related
+What specific curl commands do I need to include for setup or testing
+How can I demonstrate curl's capabilities effectively in my documentation
+Are there common curl options that enhance my plugin's functionality
+How do I explain the integration of curl with my FTP plugin clearly
+What troubleshooting tips should I add for users using curl with my plugin

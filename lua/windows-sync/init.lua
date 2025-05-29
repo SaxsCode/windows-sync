@@ -12,14 +12,26 @@ local function get_ftp_config()
 end
 
 local function upload_file_with_curl(filepath, ftp_config)
-	-- Construct FTP URL with credentials
+	local config_directory = vim.fn.fnamemodify(vim.fn.getcwd(), ":p")
+	local project_root = ftp_config.project_root or config_directory
+	project_root = vim.fn.fnamemodify(project_root, ":p")
+
+	local relative_path = vim.fn.fnamemodify(filepath, ":p")
+	relative_path = relative_path:gsub(project_root, "")
+	relative_path = relative_path:gsub("\\", "/")
+
+	-- Construct remote path
+	local remote_base = ftp_config.remote_path
+	if remote_base:sub(-1) ~= "/" then
+		remote_base = remote_base .. "/"
+	end
+	local remote_path = remote_base .. relative_path
+
+	local escaped_filepath = filepath:gsub("\\", "/")
+
 	local ftp_url =
 		string.format("ftp://%s:%s@%s%s", ftp_config.user, ftp_config.password, ftp_config.host, ftp_config.remote_path)
 
-	-- Escape backslashes in Windows path for curl
-	local escaped_filepath = filepath:gsub("\\", "/")
-
-	-- Build curl command
 	local cmd = string.format('curl -T "%s" "%s"', escaped_filepath, ftp_url)
 
 	-- Execute the command
