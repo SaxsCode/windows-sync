@@ -20,12 +20,13 @@ local function upload_file(filepath, ftp_config)
 	local script_path = os.tmpname() .. ".ftp"
 	local script = string.format(
 		[[
-			open %s
-			user %s %s
-			binary
-			put "%s" "%s"
-			bye
-			]],
+    open %s
+    %s
+    %s
+    binary
+    put "%s" "%s"
+    bye
+  ]],
 		ftp_config.host,
 		ftp_config.user,
 		ftp_config.password,
