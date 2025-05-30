@@ -19,9 +19,13 @@ local function upload_file_with_winscp(filepath, ftp_config)
 	else
 		project_root = vim.fn.fnamemodify(project_root, ":p")
 	end
+
+	project_root = project_root:gsub("\\", "/")
+	project_root = vim.pesc(project_root)
+
 	local relative_path = vim.fn.fnamemodify(filepath, ":p")
-	relative_path = relative_path:gsub(project_root, "")
 	relative_path = relative_path:gsub("\\", "/")
+	relative_path = relative_path:gsub("^" .. project_root, "")
 
 	local remote_base = ftp_config.remote_path
 	if remote_base:sub(-1) ~= "/" then
