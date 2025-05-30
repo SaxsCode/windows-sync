@@ -6,7 +6,6 @@ local function get_ftp_config()
 	if ok then
 		return config
 	else
-		print("Error: No project FTP config found or error in config file.")
 		return nil
 	end
 end
@@ -76,7 +75,6 @@ function module.setup(opts)
 			callback = function(args)
 				local ftp_config = get_ftp_config()
 				if not ftp_config then
-					print("Error: No valid FTP config for this project.")
 					return
 				end
 				local filepath = vim.api.nvim_buf_get_name(args.buf)
