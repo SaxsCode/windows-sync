@@ -26,8 +26,8 @@ local function upload_file_with_winscp(filepath, ftp_config)
 
 	-- URL-encode special characters in password
 	local encoded_password = ftp_config.password:gsub("[%%&]", {
-		["%"] = "%%25",
-		["&"] = "%%26",
+		["%"] = "%25",
+		["&"] = "%26",
 	})
 
 	-- WinSCP command
