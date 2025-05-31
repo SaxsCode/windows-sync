@@ -10,18 +10,23 @@ local function upload_file_with_winscp(filepath, ftp_config)
 	-- Normalize project root
 	local project_root = ftp_config.project_root or vim.fn.getcwd()
 	project_root = vim.fn.fnamemodify(project_root, ":p")
-	project_root = project_root:gsub("\\", "/"):gsub("/$", "")
+	project_root = project_root:gsub("\\", "/"):gsub("/+$", "")
 
 	-- Get absolute file path and normalize
 	local absolute_filepath = vim.fn.fnamemodify(filepath, ":p")
-	absolute_filepath = absolute_filepath:gsub("\\", "/")
+	absolute_filepath = absolute_filepath:gsub("\\", "/"):gsub("/+$", "")
 
+	print("Project Root:", project_root)
+	print("Absolute Path:", absolute_filepath)
+	print("Relative Path (before):", absolute_filepath:sub(#project_root + 1))
 	-- Calculate relative path
 	local relative_path = absolute_filepath:sub(#project_root + 2)
+	relative_path = relative_path:gsub("^/", "")
 
+	print("Relative Path (after):", relative_path)
 	-- Construct remote path
 	local remote_base = ftp_config.remote_path
-	remote_base = remote_base:gsub("/$", "") .. "/"
+	remote_base = remote_base:gsub("/+$", "") .. "/"
 	local remote_path = remote_base .. relative_path
 
 	-- URL-encode special characters in password
