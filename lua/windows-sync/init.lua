@@ -30,8 +30,8 @@ local function upload_file_with_winscp(filepath, ftp_config)
 		["&"] = "%26",
 	})
 
-	-- WinSCP command
-	local remote_dir = remote_path:match("(.*/)") or remote_base
+	-- WinSCP command: create the directory (without trailing slash for mkdir)
+	local remote_dir = remote_base:gsub("/$", "")
 	local cmd = string.format(
 		'winscp.com /command "open ftp://%s:%s@%s/" "mkdir %s" "put \\"%s\\" \\"%s\\"" "exit"',
 		ftp_config.user,
