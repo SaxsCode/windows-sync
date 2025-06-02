@@ -10,15 +10,15 @@ local function upload_file_with_winscp(filepath, ftp_config)
 	-- Normalize project root
 	local project_root = ftp_config.project_root or vim.fn.getcwd()
 	project_root = vim.fn.fnamemodify(project_root, ":p")
-	project_root = project_root:gsub("\\", "/"):gsub("/+$", "")
+	project_root = project_root:gsub("/", "\\"):gsub("\\+$", "")
 
 	-- Get absolute file path and normalize
 	local absolute_filepath = vim.fn.fnamemodify(filepath, ":p")
-	absolute_filepath = absolute_filepath:gsub("\\", "/"):gsub("/+$", "")
+	absolute_filepath = absolute_filepath:gsub("/", "\\"):gsub("\\+$", "")
 
 	-- Calculate relative path
 	local relative_path = absolute_filepath:sub(#project_root + 2)
-	relative_path = relative_path:gsub("^/", "")
+	relative_path = relative_path:gsub("^\\", "")
 
 	-- Construct remote path
 	local remote_base = ftp_config.remote_path
@@ -33,13 +33,14 @@ local function upload_file_with_winscp(filepath, ftp_config)
 
 	local mkdir_target = remote_base:gsub("/+$", "")
 
+	-- Generate the command
 	local cmd = string.format(
-		'winscp.com /command "open ftp://%s:%s@%s/" "mkdir %s" "put \\"%s\\" \\"%s\\"" "exit"',
+		'winscp.com /command "open ftp://%s:%s@%s/" "mkdir %s" "put %s %s" "exit"',
 		ftp_config.user,
 		encoded_password,
 		ftp_config.host,
 		mkdir_target,
-		absolute_filepath:gsub("/", "\\"), -- Use backslashes for local path
+		absolute_filepath,
 		remote_path
 	)
 
