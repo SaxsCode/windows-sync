@@ -78,6 +78,7 @@ return {
 - Add download functionality from remote server.
 - Create a command to upload files.
 - Allow passing parameters to upload specific files or folders.
+- Configure SFTP per project
 
 ---
 
