@@ -6,6 +6,17 @@ local function get_ftp_config()
 	return ok and config or nil
 end
 
+local function url_encode(str)
+	if str then
+		str = str:gsub("\n", "\r\n")
+		str = str:gsub("([^%w _%%%-%.~])", function(c)
+			return string.format("%%%02X", string.byte(c))
+		end)
+		str = str:gsub(" ", "+")
+	end
+	return str
+end
+
 local function upload_file_with_winscp(filepath, ftp_config)
 	-- Normalize project root and absolute path (use backslashes for local)
 	local project_root = ftp_config.project_root or vim.fn.getcwd()
@@ -21,7 +32,7 @@ local function upload_file_with_winscp(filepath, ftp_config)
 	local remote_path = remote_base .. (remote_base:sub(-1) ~= "/" and "/" or "") .. relative_path
 
 	-- URL-encode password
-	local encoded_password = ftp_config.password:gsub("[%%&]", { ["%"] = "%25", ["&"] = "%26" })
+	local encoded_password = url_encode(ftp_config.password)
 
 	-- mkdir target (use forward slashes)
 	local mkdir_target = remote_base:gsub("/+$", "")
