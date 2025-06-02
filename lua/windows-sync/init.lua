@@ -26,7 +26,7 @@ local function upload_file_with_winscp(filepath, ftp_config)
 	print("Relative Path (after):", relative_path)
 	-- Construct remote path
 	local remote_base = ftp_config.remote_path
-	remote_base = remote_base:gsub("/+$", "") .. "/"
+	remote_base = remote_base:gsub("/+$", "")
 	local remote_path = remote_base .. relative_path
 
 	-- URL-encode special characters in password
@@ -35,7 +35,6 @@ local function upload_file_with_winscp(filepath, ftp_config)
 		["&"] = "%26",
 	})
 
-	-- WinSCP command: create the directory (without trailing slash for mkdir)
 	local remote_dir = remote_base:gsub("/$", "")
 	local cmd = string.format(
 		'winscp.com /command "open ftp://%s:%s@%s/" "mkdir %s" "put \\"%s\\" \\"%s\\"" "exit"',
