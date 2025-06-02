@@ -7,33 +7,26 @@ local function get_ftp_config()
 end
 
 local function upload_file_with_winscp(filepath, ftp_config)
-	-- Normalize project root
+	-- Normalize project root and absolute path (use backslashes for local)
 	local project_root = ftp_config.project_root or vim.fn.getcwd()
-	project_root = vim.fn.fnamemodify(project_root, ":p")
-	project_root = project_root:gsub("/", "\\"):gsub("\\+$", "")
+	project_root = vim.fn.fnamemodify(project_root, ":p"):gsub("/", "\\"):gsub("\\+$", "")
+	local absolute_filepath = vim.fn.fnamemodify(filepath, ":p"):gsub("/", "\\"):gsub("\\+$", "")
 
-	-- Get absolute file path and normalize
-	local absolute_filepath = vim.fn.fnamemodify(filepath, ":p")
-	absolute_filepath = absolute_filepath:gsub("/", "\\"):gsub("\\+$", "")
+	-- Calculate relative path (use backslashes for now)
+	local relative_path = absolute_filepath:sub(#project_root + 2):gsub("^\\", "")
 
-	-- Calculate relative path
-	local relative_path = absolute_filepath:sub(#project_root + 2)
-	relative_path = relative_path:gsub("^\\", "")
-
-	-- Construct remote path
-	local remote_base = ftp_config.remote_path
-	remote_base = remote_base:gsub("/+$", "")
+	-- Construct remote path (use forward slashes)
+	local remote_base = ftp_config.remote_path:gsub("\\", "/"):gsub("/+$", "")
+	relative_path = relative_path:gsub("\\", "/")
 	local remote_path = remote_base .. (remote_base:sub(-1) ~= "/" and "/" or "") .. relative_path
 
-	-- URL-encode special characters in password
-	local encoded_password = ftp_config.password:gsub("[%%&]", {
-		["%"] = "%25",
-		["&"] = "%26",
-	})
+	-- URL-encode password
+	local encoded_password = ftp_config.password:gsub("[%%&]", { ["%"] = "%25", ["&"] = "%26" })
 
+	-- mkdir target (use forward slashes)
 	local mkdir_target = remote_base:gsub("/+$", "")
 
-	-- Generate the command
+	-- Generate command
 	local cmd = string.format(
 		'winscp.com /command "open ftp://%s:%s@%s/" "mkdir %s" "put %s %s" "exit"',
 		ftp_config.user,
@@ -44,7 +37,7 @@ local function upload_file_with_winscp(filepath, ftp_config)
 		remote_path
 	)
 
-	-- Execute command
+	-- Execute
 	local result = os.execute(cmd)
 	if result == 0 then
 		print("Success: Uploaded " .. filepath .. " to " .. remote_path)
