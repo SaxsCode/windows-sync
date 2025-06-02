@@ -36,12 +36,14 @@ local function upload_file_with_winscp(filepath, ftp_config)
 	})
 
 	local remote_dir = remote_base:gsub("/$", "")
+
+	local mkdir_target = remote_base:gsub("/+$", "")
 	local cmd = string.format(
-		'winscp.com /command "open ftp://%s:%s@%s/" "mkdir %s" "put \\"%s\\" \\"%s\\"" "exit"',
+		'winscp.com /command "open ftp://%s:%s@%s/" "mkdir %s" "put %q %q" "exit"',
 		ftp_config.user,
 		encoded_password,
 		ftp_config.host,
-		remote_dir,
+		mkdir_target,
 		absolute_filepath,
 		remote_path
 	)
