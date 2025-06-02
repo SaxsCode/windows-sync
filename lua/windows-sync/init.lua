@@ -28,7 +28,8 @@ local function upload_file_with_winscp(filepath, ftp_config)
 
 	-- Generate command
 	local cmd = string.format(
-		'winscp.com /command "open ftp://%s:%s@%s/" "mkdir %s" "put %s %s" "exit"',
+		'winscp.com /command "open %s://%s:%s@%s/" "mkdir %s" "put %s %s" "exit"',
+		ftp_config.prefix,
 		ftp_config.user,
 		encoded_password,
 		ftp_config.host,
@@ -40,9 +41,13 @@ local function upload_file_with_winscp(filepath, ftp_config)
 	-- Execute
 	local result = os.execute(cmd)
 	if result == 0 then
-		print("Success: Uploaded " .. filepath .. " to " .. remote_path)
+		vim.notify(
+			"Success: Uploaded " .. filepath .. " to " .. remote_path,
+			vim.log.levels.INFO,
+			{ title = "windows-sync" }
+		)
 	else
-		print("Error: Upload failed. Command: " .. cmd)
+		vim.notify("Error: Upload failed. Command: " .. cmd, vim.log.levels.ERROR, { title = "windows-sync" })
 	end
 end
 
@@ -53,7 +58,7 @@ function module.setup(opts)
 		if ftp_config then
 			upload_file_with_winscp(vim.api.nvim_buf_get_name(0), ftp_config)
 		else
-			print("Error: No valid FTP config found")
+			vim.notify("Error: No valid FTP config found", vim.log.levels.WARN, { title = "windows-sync" })
 		end
 	end, { desc = "Upload current file" })
 

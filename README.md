@@ -46,10 +46,11 @@ Create a `ftp_config.lua` file in your project root with the following structure
 
 ```lua
 return {
-    host = "", -- FTP server hostname (no protocol prefix)
-    user = "", -- FTP username
-    password = "", -- FTP password
-    remote_path = "", -- Remote path including filename or directory
+    prefix = "ftp" -- or sftp
+    host = "", 
+    user = "",
+    password = "",
+    remote_path = "",
     project_root = nil -- If nil, use config directory as root
 }
 ```
