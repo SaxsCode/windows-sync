@@ -18,24 +18,26 @@ local function url_encode(str)
 end
 
 local function upload_file_with_winscp(filepath, ftp_config)
-	-- Normalize project root and absolute path (use backslashes for local)
+	-- Path of project root
 	local project_root = ftp_config.project_root or vim.fn.getcwd()
-	project_root = vim.fn.fnamemodify(project_root, ":p"):gsub("/", "\\"):gsub("\\+$", "")
+	project_root = vim.fn.fnamemodify(project_root, ":p"):gsub("/", "\\"):gsub("\\+$", "") .. "\\"
+
+	-- Path of file to be uploaded
 	local absolute_filepath = vim.fn.fnamemodify(filepath, ":p"):gsub("/", "\\"):gsub("\\+$", "")
 
-	-- Calculate relative path (use backslashes for now)
-	local relative_path = absolute_filepath:sub(#project_root + 2):gsub("^\\", "")
+	-- Get relative path
+	if not absolute_filepath:find(project_root, 1, true) then
+		error("File is not under the project root")
+	end
+	local relative_path = absolute_filepath:sub(#project_root + 1)
+	relative_path = relative_path:gsub("^\\", ""):gsub("\\", "/")
 
-	-- Construct remote path (use forward slashes)
+	-- Get remote path and base
 	local remote_base = ftp_config.remote_path:gsub("\\", "/"):gsub("/+$", "")
-	relative_path = relative_path:gsub("\\", "/")
 	local remote_path = remote_base .. (remote_base:sub(-1) ~= "/" and "/" or "") .. relative_path
 
 	-- URL-encode password
 	local encoded_password = url_encode(ftp_config.password)
-
-	-- mkdir target (use forward slashes)
-	local mkdir_target = remote_base:gsub("/+$", "")
 
 	-- Generate command
 	local cmd = string.format(
@@ -44,7 +46,7 @@ local function upload_file_with_winscp(filepath, ftp_config)
 		ftp_config.user,
 		encoded_password,
 		ftp_config.host,
-		mkdir_target,
+		remote_base,
 		absolute_filepath,
 		remote_path
 	)
@@ -64,8 +66,10 @@ end
 
 function module.setup(opts)
 	opts = opts or {}
+	local ftp_config = get_ftp_config()
+
+	-- On keymap press
 	vim.keymap.set("n", opts.keymap or "<Leader>fu", function()
-		local ftp_config = get_ftp_config()
 		if ftp_config then
 			upload_file_with_winscp(vim.api.nvim_buf_get_name(0), ftp_config)
 		else
@@ -73,11 +77,11 @@ function module.setup(opts)
 		end
 	end, { desc = "Upload current file" })
 
+	-- On save
 	if opts.auto_upload then
 		vim.api.nvim_create_autocmd("BufWritePost", {
 			group = vim.api.nvim_create_augroup("FtpAutoUpload", { clear = true }),
 			callback = function(args)
-				local ftp_config = get_ftp_config()
 				if ftp_config then
 					upload_file_with_winscp(vim.api.nvim_buf_get_name(args.buf), ftp_config)
 				end
