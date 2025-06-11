@@ -46,7 +46,8 @@ Create a `ftp_config.lua` file in your project root with the following structure
 
 ```lua
 return {
-    prefix = "ftp" -- or sftp
+    active = 1, -- or 0 to disable
+    prefix = "ftp", -- or sftp
     host = "", 
     user = "",
     password = "",
