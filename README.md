@@ -1,12 +1,12 @@
 # windows-sync
 
-A simple Lua plugin for Neovim to upload files to FTP servers, designed specifically for Windows environments.
+A simple Lua plugin for Neovim to upload files or directories to FTP servers, designed specifically for Windows environments.
 
 ---
 
 ## Features
 
-- **Upload the current file to a configured FTP server directly from Neovim using WinSCP.**
+- **Upload files / directories to a configured FTP server directly from Neovim using WinSCP.**
 - **Automatic remote directory creation**
 - **Fully automated FTP uploads with username and password authentication.**
 - **Easy per-project FTP configuration via a Lua config file.**
@@ -45,7 +45,7 @@ return {
 Create a `ftp_config.lua` file in your project root with the following structure:
 
 ```lua
-return {
+local server = {
     active = 1, -- or 0 to disable
     prefix = "ftp", -- or sftp
     host = "", 
@@ -54,6 +54,24 @@ return {
     remote_path = "",
     project_root = nil -- If nil, use config directory as root
 }
+
+-- You can add new servers here: local server2 = {} etc. and pass the active server in return
+
+return server1;
+```
+
+Copy without comments:
+```lua
+local server = {
+    active = 1,
+    prefix = "ftp",
+    host = "", 
+    user = "",
+    password = "",
+    remote_path = "",
+    project_root = nil 
+}
+return server1;
 ```
 
 **Note:**  
@@ -69,18 +87,14 @@ return {
 - **Press the configured keymap (default `<Leader>fu`)** to upload the current file to the remote FTP server.
 - **Enable auto-upload on save** by setting `auto_upload = true` in your plugin configuration.
   - This will automatically upload the file every time you save it (`:w`).
+- **Use :Upload {file/dir}** to upload a specific file or directory (with its contents). 
 - **The plugin uses WinSCP to perform the upload and create remote directories as needed.**
 
 ---
 
 ## Wishlist
-
-- Support multiple FTP servers per project.
 - Add a command to generate a default FTP config in the project root.
 - Add download functionality from remote server.
-- Create a command to upload files.
-- Allow passing parameters to upload specific files or folders.
-- Configure SFTP per project
 
 ---
 
