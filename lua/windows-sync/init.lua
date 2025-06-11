@@ -68,6 +68,11 @@ function module.setup(opts)
 	opts = opts or {}
 	local ftp_config = get_ftp_config()
 
+	local active = ftp_config.active or 1
+	if active == 0 then
+		return
+	end
+
 	-- On keymap press
 	vim.keymap.set("n", opts.keymap or "<Leader>fu", function()
 		if ftp_config then
