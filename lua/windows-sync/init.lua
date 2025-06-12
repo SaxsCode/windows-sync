@@ -39,19 +39,14 @@ local function upload_file_with_winscp(filepath, ftp_config)
 	-- URL-encode password
 	local encoded_password = url_encode(ftp_config.password)
 
-	-- Determine if it's a directory or file
-	local is_dir = vim.fn.isdirectory(absolute_filepath) == 1
-	local put_cmd = is_dir and "put -r" or "put"
-
 	-- Generate command
 	local cmd = string.format(
-		'winscp.com /command "open %s://%s:%s@%s/" "mkdir %s" "%s %s %s" "exit"',
+		'winscp.com /command "open %s://%s:%s@%s/" "mkdir %s" "put %s %s" "exit"',
 		ftp_config.prefix,
 		ftp_config.user,
 		encoded_password,
 		ftp_config.host,
 		remote_base,
-		put_cmd,
 		absolute_filepath,
 		remote_path
 	)
