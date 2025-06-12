@@ -64,21 +64,28 @@ local function upload_file_with_winscp(filepath, ftp_config)
 	end
 end
 
+local function get_config(show_error)
+	local ftp_config = get_ftp_config()
+	if not ftp_config and show_error then
+		vim.notify("Warning: No valid FTP config found", vim.log.levels.WARN, { title = "windows-sync" })
+	end
+	return ftp_config
+end
+
 function module.setup(opts)
 	opts = opts or {}
-	local ftp_config = get_ftp_config()
 
-	local active = ftp_config.active or 1
+	local ftp_config = get_config(false)
+	local active = (ftp_config and ftp_config.active) or 1
 	if active == 0 then
 		return
 	end
 
 	-- On keymap press
 	vim.keymap.set("n", opts.keymap or "<Leader>fu", function()
+		local ftp_config = get_config()
 		if ftp_config then
 			upload_file_with_winscp(vim.api.nvim_buf_get_name(0), ftp_config)
-		else
-			vim.notify("Error: No valid FTP config found", vim.log.levels.WARN, { title = "windows-sync" })
 		end
 	end, { desc = "Upload current file" })
 
@@ -87,6 +94,7 @@ function module.setup(opts)
 		vim.api.nvim_create_autocmd("BufWritePost", {
 			group = vim.api.nvim_create_augroup("FtpAutoUpload", { clear = true }),
 			callback = function(args)
+				local ftp_config = get_config(false)
 				if ftp_config then
 					upload_file_with_winscp(vim.api.nvim_buf_get_name(args.buf), ftp_config)
 				end
@@ -103,10 +111,9 @@ function module.setup(opts)
 			filename = vim.fn.fnamemodify(opts.args, ":p")
 		end
 
+		local ftp_config = get_config()
 		if ftp_config then
 			upload_file_with_winscp(filename, ftp_config)
-		else
-			vim.notify("Error: No valid FTP config found", vim.log.levels.WARN, { title = "windows-sync" })
 		end
 	end, { nargs = "?", desc = "Upload current file or specified file via FTP/SFTP" })
 end
