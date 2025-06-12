@@ -57,7 +57,7 @@ local server = {
 
 -- You can add new servers here: local server2 = {} etc. and pass the active server in return
 
-return server1;
+return server;
 ```
 
 Copy without comments:
@@ -71,7 +71,7 @@ local server = {
     remote_path = "",
     project_root = nil 
 }
-return server1;
+return server;
 ```
 
 **Note:**  
