@@ -97,7 +97,7 @@ function module.setup(opts)
 	end
 
 	-- Command for uploading specific file or directory
-	vim.api.nvim_create_user_command("syncUpload", function(opts)
+	vim.api.nvim_create_user_command("Upload", function(opts)
 		local filename
 		if opts.args == "" then
 			filename = vim.api.nvim_buf_get_name(0)
@@ -112,7 +112,7 @@ function module.setup(opts)
 	end, { nargs = "?", desc = "Upload current file or specified file via FTP/SFTP" })
 
 	-- Command for creating FTP config
-	vim.api.nvim_create_user_command("syncConfig", function()
+	vim.api.nvim_create_user_command("Config", function()
 		local project_root = vim.fn.getcwd()
 		local file = io.open(project_root .. "/ftp_config.lua", "w")
 		if not file then
