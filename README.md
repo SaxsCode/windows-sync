@@ -46,13 +46,12 @@ Create a `ftp_config.lua` file in your project root with the following structure
 
 ```lua
 local server = {
-    active = 1, -- or 0 to disable
-    prefix = "ftp", -- or sftp
+    prefix = "ftp",
     host = "", 
     user = "",
     password = "",
     remote_path = "",
-    project_root = nil -- If nil, use config directory as root
+    project_root = nil
 }
 
 -- You can add new servers here: local server2 = {} etc. and pass the active server in return
@@ -60,24 +59,10 @@ local server = {
 return server;
 ```
 
-Copy without comments:
-```lua
-local server = {
-    active = 1,
-    prefix = "ftp",
-    host = "", 
-    user = "",
-    password = "",
-    remote_path = "",
-    project_root = nil 
-}
-return server;
-```
-
 **Note:**  
 - The `host` should be just the hostname without `ftp://` or trailing slashes.  
 - `remote_path` can be a directory (e.g., `"/"`) or full remote filename (e.g., `"/myfile.txt"`).
-- `project_root` can be set to a subfolder of your project to control which local paths are mirrored remotely.
+- `project_root` can be set to a subfolder of your project, when nil use project root.
 
 ---
 
