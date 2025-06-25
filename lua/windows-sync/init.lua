@@ -96,8 +96,8 @@ function module.setup(opts)
 		})
 	end
 
-	-- Command (with parameter)
-	vim.api.nvim_create_user_command("Upload", function(opts)
+	-- Command for uploading specific file or directory
+	vim.api.nvim_create_user_command("syncUpload", function(opts)
 		local filename
 		if opts.args == "" then
 			filename = vim.api.nvim_buf_get_name(0)
@@ -110,6 +110,31 @@ function module.setup(opts)
 			upload_file_with_winscp(filename, ftp_config)
 		end
 	end, { nargs = "?", desc = "Upload current file or specified file via FTP/SFTP" })
+
+	-- Command for creating FTP config
+	vim.api.nvim_create_user_command("syncConfig", function()
+		local project_root = vim.fn.getcwd()
+		local file = io.open(project_root .. "/ftp_config.lua", "w")
+		if not file then
+			vim.notify("Failed to create ftp_config.lua", vim.log.levels.ERROR)
+			return
+		end
+		local config_text = [[
+            local server = {
+                prefix = "ftp",
+                host = "",
+                user = "",
+                password = "",
+                remote_path = "",
+                project_root = nil
+            }
+
+            return server
+        ]]
+		file:write(config_text)
+		file:close()
+		vim.notify("Created ftp_config.lua in project root", vim.log.levels.INFO)
+	end, { desc = "Create ftp_config.lua in project root" })
 end
 
 return module
