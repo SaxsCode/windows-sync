@@ -120,17 +120,17 @@ function module.setup(opts)
 			return
 		end
 		local config_text = [[
-            local server = {
-                prefix = "ftp",
-                host = "",
-                user = "",
-                password = "",
-                remote_path = "",
-                project_root = nil
-            }
+local server = {
+    prefix = "ftp",
+    host = "",
+    user = "",
+    password = "",
+    remote_path = "",
+    project_root = nil
+}
 
-            return server
-        ]]
+return server
+]]
 		file:write(config_text)
 		file:close()
 		vim.notify("Created ftp_config.lua in project root", vim.log.levels.INFO)
