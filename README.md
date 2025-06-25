@@ -42,7 +42,7 @@ return {
 
 ## Configuration
 
-Create a `ftp_config.lua` file in your project root with the following structure:
+Create a `ftp_config.lua` file in your project root with the following structure manually or by using the command: `:Config`
 
 ```lua
 local server = {
