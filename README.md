@@ -77,12 +77,6 @@ return server;
 
 ---
 
-## Wishlist
-- Add a command to generate a default FTP config in the project root.
-- Add download functionality from remote server.
-
----
-
 ## Notes and Limitations
 
 - **Requires WinSCP installed and accessible in your system PATH.**
