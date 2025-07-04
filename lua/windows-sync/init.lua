@@ -17,20 +17,23 @@ local function url_encode(str)
 	return str
 end
 
-local function upload_file_with_winscp(filepath, ftp_config)
-	-- Path of project root
-	local project_root = ftp_config.project_root or vim.fn.getcwd()
-	project_root = vim.fn.fnamemodify(project_root, ":p"):gsub("/", "\\"):gsub("\\+$", "") .. "\\"
+local function normalize_path(path)
+    return (vim.fn.fnamemodify(path, ":p"):gsub("\\", "/"):gsub("/+$","")):lower()
+end
 
-	-- Path of file to be uploaded
-	local absolute_filepath = vim.fn.fnamemodify(filepath, ":p"):gsub("/", "\\"):gsub("\\+$", "")
+local function upload_file_with_winscp(filepath, ftp_config)
+	local project_root = normalize_path(ftp_config.project_root or vim.fn.getcwd())
+	local absolute_filepath = normalize_path(filepath)
+
+    -- File needs to be under root path
+    if absolute_filepath:sub(1, #project_root) ~= project_root then
+		vim.notify("ERROR: File is not under the project root", vim.log.levels.ERROR, { title = "windows-sync" })
+        return
+	end
 
 	-- Get relative path
-	if not absolute_filepath:find(project_root, 1, true) then
-		error("File is not under the project root")
-	end
-	local relative_path = absolute_filepath:sub(#project_root + 1)
-	relative_path = relative_path:gsub("^\\", ""):gsub("\\", "/")
+	local relative_path = absolute_filepath:sub(#project_root + 2)
+	relative_path = relative_path:gsub("\\", "/")
 
 	-- Get remote path and base
 	local remote_base = ftp_config.remote_path:gsub("\\", "/"):gsub("/+$", "")
