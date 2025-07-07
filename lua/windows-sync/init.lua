@@ -63,7 +63,7 @@ local function upload_file_with_winscp(filepath, ftp_config)
 			{ title = "windows-sync" }
 		)
 	else
-		vim.notify("Error: Upload failed.", vim.log.levels.ERROR, { title = "windows-sync" })
+		vim.notify("Error: Upload failed. cmd: " .. cmd , vim.log.levels.ERROR, { title = "windows-sync" })
 	end
 end
 
