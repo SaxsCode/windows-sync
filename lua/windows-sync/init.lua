@@ -18,7 +18,7 @@ local function url_encode(str)
 end
 
 local function normalize_path(path)
-    return (vim.fn.fnamemodify(path, ":p"):gsub("\\", "/"):gsub("/+$","")):lower()
+    return (vim.fn.fnamemodify(path, ":p"):gsub("\\", "/"):gsub("/+$",""))
 end
 
 local function winscp_local_path(path)
