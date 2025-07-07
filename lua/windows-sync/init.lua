@@ -21,50 +21,58 @@ local function normalize_path(path)
     return (vim.fn.fnamemodify(path, ":p"):gsub("\\", "/"):gsub("/+$","")):lower()
 end
 
+local function winscp_local_path(path)
+    local win_path = vim.fn.fnamemodify(path, ":p"):gsub("/", "\\")
+    return '"' .. win_path .. '"'
+end
+
 local function upload_file_with_winscp(filepath, ftp_config)
-	local project_root = normalize_path(ftp_config.project_root or vim.fn.getcwd())
-	local absolute_filepath = normalize_path(filepath)
+    local project_root = normalize_path(ftp_config.project_root or vim.fn.getcwd())
+    local absolute_filepath = normalize_path(filepath)
 
     -- File needs to be under root path
     if absolute_filepath:sub(1, #project_root) ~= project_root then
-		vim.notify("ERROR: File is not under the project root", vim.log.levels.ERROR, { title = "windows-sync" })
+        vim.notify("ERROR: File is not under the project root", vim.log.levels.ERROR, { title = "windows-sync" })
         return
-	end
+    end
 
-	-- Get relative path
-	local relative_path = absolute_filepath:sub(#project_root + 2)
-	relative_path = relative_path:gsub("\\", "/")
+    -- Get relative path
+    local relative_path = absolute_filepath:sub(#project_root + 2)
+    relative_path = relative_path:gsub("\\", "/")
 
-	-- Get remote path and base
-	local remote_base = ftp_config.remote_path:gsub("\\", "/"):gsub("/+$", "")
-	local remote_path = remote_base .. (remote_base:sub(-1) ~= "/" and "/" or "") .. relative_path
+    -- Get remote path and base
+    local remote_base = ftp_config.remote_path:gsub("\\", "/"):gsub("/+$", "")
+    local remote_path = remote_base .. (remote_base:sub(-1) ~= "/" and "/" or "") .. relative_path
 
-	-- URL-encode password
-	local encoded_password = url_encode(ftp_config.password)
+    -- URL-encode password
+    local encoded_password = url_encode(ftp_config.password)
 
-	-- Generate command
-	local cmd = string.format(
-		'winscp.com /command "open %s://%s:%s@%s/" "mkdir %s" "put %s %s" "exit"',
-		ftp_config.prefix,
-		ftp_config.user,
-		encoded_password,
-		ftp_config.host,
-		remote_base,
-		absolute_filepath,
-		remote_path
-	)
+    -- Gebruik de aangepaste functie voor het lokale pad
+    local local_path_for_winscp = winscp_local_path(filepath)
 
-	-- Execute
-	local result = os.execute(cmd)
-	if result == 0 then
-		vim.notify(
-			"Success: Uploaded to " .. remote_path,
-			vim.log.levels.INFO,
-			{ title = "windows-sync" }
-		)
-	else
-		vim.notify("Error: Upload failed. cmd: " .. cmd , vim.log.levels.ERROR, { title = "windows-sync" })
-	end
+    -- Generate command
+    local cmd = string.format(
+        'winscp.com /command "open %s://%s:%s@%s/" "mkdir %s" "put %s %s" "exit"',
+        ftp_config.prefix,
+        ftp_config.user,
+        encoded_password,
+        ftp_config.host,
+        remote_base,
+        local_path_for_winscp,
+        remote_path
+    )
+
+    -- Execute
+    local result = os.execute(cmd)
+    if result == 0 then
+        vim.notify(
+            "Success: Uploaded to " .. remote_path,
+            vim.log.levels.INFO,
+            { title = "windows-sync" }
+        )
+    else
+        vim.notify("Error: Upload failed. cmd: " .. cmd , vim.log.levels.ERROR, { title = "windows-sync" })
+    end
 end
 
 local function get_config(show_error)
