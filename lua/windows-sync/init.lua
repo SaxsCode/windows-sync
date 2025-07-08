@@ -27,10 +27,6 @@ local function normalize_path(path)
     return normalized
 end
 
-local function normalize_path(path)
-    return (vim.fn.fnamemodify(path, ":p"):gsub("\\", "/"):gsub("/+$",""))
-end
-
 local function winscp_local_path(path)
     local win_path = vim.fn.fnamemodify(path, ":p"):gsub("/", "\\")
     return '"' .. win_path .. '"'
