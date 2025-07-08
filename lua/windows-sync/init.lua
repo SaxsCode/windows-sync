@@ -27,10 +27,15 @@ local function normalize_path(path)
     return normalized
 end
 
+
 local function winscp_local_path(path)
     local win_path = vim.fn.fnamemodify(path, ":p"):gsub("/", "\\")
+    win_path = win_path:gsub("^([a-zA-Z]):", function(drive)
+        return drive:upper() .. ":"
+    end)
     return '"' .. win_path .. '"'
 end
+
 
 local function upload_file_with_winscp(filepath, ftp_config)
     local project_root = normalize_path(ftp_config.project_root or vim.fn.getcwd())
@@ -53,7 +58,6 @@ local function upload_file_with_winscp(filepath, ftp_config)
     -- URL-encode password
     local encoded_password = url_encode(ftp_config.password)
 
-    -- Gebruik de aangepaste functie voor het lokale pad
     local local_path_for_winscp = winscp_local_path(filepath)
 
     -- Generate command
