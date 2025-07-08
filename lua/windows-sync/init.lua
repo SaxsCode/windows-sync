@@ -18,6 +18,16 @@ local function url_encode(str)
 end
 
 local function normalize_path(path)
+    local normalized = vim.fn.fnamemodify(path, ":p"):gsub("\\", "/"):gsub("/+$", "")
+
+    normalized = normalized:gsub("^([a-zA-Z]):", function(drive)
+        return drive:upper() .. ":"
+    end)
+
+    return normalized
+end
+
+local function normalize_path(path)
     return (vim.fn.fnamemodify(path, ":p"):gsub("\\", "/"):gsub("/+$",""))
 end
 
